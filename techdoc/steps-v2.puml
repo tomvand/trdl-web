@@ -1,0 +1,107 @@
+@startuml
+allowmixing
+
+package "Class diagram" as data {
+
+  package Shared_Communication_pkg {
+    class MessageBus
+  }
+
+  package Client_pkg {
+    package UI_pkg {
+      class UIPlatform <<platform abstraction>>
+      abstract Widget <<subclass sandbox>>
+
+      class UI
+      class RailNetworkView {
+        draw()
+      }
+      class TrackWidget {
+        draw()
+      }
+      class PointsWidget {
+        draw()
+        set()
+      }
+      class SignalWidget {
+        draw()
+        set()
+      }
+
+      UI --* RailNetworkView
+
+      RailNetworkView --* TrackWidget
+      RailNetworkView --* PointsWidget
+      RailNetworkView --* SignalWidget
+
+      UIPlatform <-- Widget
+
+      Widget <|-- TrackWidget
+      Widget <|-- PointsWidget
+      Widget <|-- SignalWidget
+    }
+  }
+
+  package Server_pkg {
+    package RailNetwork_pkg {
+      class RailNetwork
+
+      class Track
+      class Points
+      class Signal
+
+      RailNetwork --* Track
+      RailNetwork --* Points
+      RailNetwork --* Signal
+    }
+
+    package Interlocking_pkg {
+      class Interlocking <<todo>>
+    }
+  }
+
+  package Shared_Configuration_pkg {
+    class RailNetworkConfiguration <<immutable>> <<serializable>>
+    class TrackConfiguration <<immutable>>
+    class PointsConfiguration <<immutable>>
+    class SignalConfiguration <<immutable>>
+
+    TrackConfiguration *-- RailNetworkConfiguration
+    PointsConfiguration *-- RailNetworkConfiguration
+    SignalConfiguration *-- RailNetworkConfiguration
+  }
+
+  MessageBus <-- UI
+  MessageBus <-- RailNetwork
+  MessageBus <-- Interlocking
+
+  Track --> TrackConfiguration
+  Points --> PointsConfiguration
+  Signal --> SignalConfiguration
+
+  TrackWidget --> TrackConfiguration
+  PointsWidget --> PointsConfiguration
+  SignalWidget --> SignalConfiguration
+
+  Interlocking --> TrackConfiguration
+  Interlocking --> PointsConfiguration
+  Interlocking --> SignalConfiguration
+
+}
+
+package "Implementation steps" as impl {
+  rectangle "I have a syntax to describe\ntracks, points and signals" as impl_net
+  rectangle "I have a UI that shows\nthe rail network" as impl_ui_net
+  rectangle "I have example data\nfor a rail network" as impl_net_example
+  rectangle "I can control\npoints and signals\nfrom the UI" as impl_ui_control_pts_sigs
+  rectangle "..." as dont_plan_ahead_too_far
+
+  impl_ui_net <-- impl_net
+  impl_ui_net <-> impl_net_example
+
+  impl_ui_control_pts_sigs <-- impl_ui_net
+
+  dont_plan_ahead_too_far <-- impl_ui_control_pts_sigs
+}
+
+@enduml
