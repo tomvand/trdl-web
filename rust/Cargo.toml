@@ -1,7 +1,0 @@
-[workspace]
-members = [
-    "trdl",
-    "trdl-cli",
-    "trdl-wasm",
-]
-resolver = "3"
