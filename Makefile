@@ -5,17 +5,17 @@ BUILD ?= build
 
 # Paths
 
-SRCS_TRDL := $(wildcard src/trdl/*.cpp)
-SRCS_ARDUINO := $(wildcard src/arduino/*.cpp)
-SRCS_SERVER := $(wildcard src/server/*.cpp)
-SRCS_CLIENT :=$(wildcard src/client/*.cpp)
-SRCS_TEST := $(wildcard src/tests/*.cpp)
+SRCS_TRDL := $(shell find src/trdl -iname *.c*)
+SRCS_ARDUINO := $(shell find src/arduino -iname *.c*)
+SRCS_SERVER := $(shell find src/server -iname *.c*)
+SRCS_CLIENT :=$(shell find src/client -iname *.c*)
+SRCS_TEST := $(shell find src/tests -iname *.c*)
 
-HDRS_TRDL := $(wildcard src/trdl/*.hpp)
-HDRS_ARDUINO := $(wildcard src/arduino/*.hpp)
-HDRS_SERVER := $(wildcard src/server/*.hpp)
-HDRS_CLIENT := $(wildcard src/client/*.hpp)
-HDRS_TEST := $(wildcard src/tests/*.hpp)
+HDRS_TRDL := $(shell find src/trdl -iname *.h*)
+HDRS_ARDUINO := $(shell find src/arduino -iname *.h*)
+HDRS_SERVER := $(shell find src/server -iname *.h*)
+HDRS_CLIENT := $(shell find src/client -iname *.h*)
+HDRS_TEST := $(shell find src/tests -iname *.h*)
 
 INO_ARDUINO := src/arduino/trdl/trdl.ino
 
@@ -25,8 +25,13 @@ OBJS_TEST := $(patsubst src/%.cpp,$(BUILD)/test/%.o,$(SRCS_TRDL) $(SRCS_CLIENT) 
 # Tools
 
 CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra -Werror -O2
-CXXFLAGS += -I./src/arduino -I./src/client -I./src/server -I./src/tests -I./src/trdl
+CXXFLAGS := -std=c++11 -g3 -Os -Wall -Wextra -Werror
+CXXFLAGS += -Wdouble-promotion -Wformat=2 -Wshadow -Wundef -Wunused
+#CXXFLAGS += -Wconversion  # not supported by ETL
+CXXFLAGS += -ffunction-sections -fno-common -fno-exceptions
+CXXFLAGS += -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS
+CXXFLAGS += -I./lib -I./lib/etl/include
+CXXFLAGS += -I./src/arduino -I./src/client -I./src/common -I./src/server -I./src/tests -I./src/trdl
 
 
 # Commands for native
