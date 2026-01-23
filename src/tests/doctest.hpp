@@ -1,11 +1,8 @@
 #ifndef DOCTEST_HPP
 #define DOCTEST_HPP
 
-#include <doctest/doctest.h>
-
 #include "common.hpp"
 
-#define REQUIRE_SUCCESS(s) \
-  REQUIRE_MESSAGE((s) == SUCCESS, "Statement did not return SUCCESS.")
+#include <doctest.h>
 
-#endif  // DOCTEST_HPP
+#endif // DOCTEST_HPP

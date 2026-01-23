@@ -1,0 +1,24 @@
+BasedOnStyle: LLVM
+
+AlignAfterOpenBracket: DontAlign
+AlignEscapedNewlines: DontAlign
+
+AllowShortBlocksOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: WithoutElse
+RemoveBracesLLVM: true
+
+ColumnLimit: 120
+
+IncludeBlocks: Regroup
+
+IndentAccessModifiers: true
+
+IndentWidth: 2
+TabWidth: 8
+UseTab: Never
+
+# InsertNewlineAtEOF: true
+
+PointerAlignment: Left
+
+Standard: c++11
