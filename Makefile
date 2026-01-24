@@ -31,7 +31,7 @@ OBJS_TEST := $(patsubst src/%.cpp,$(BUILD)/test/%.o,$(SRCS_COMMON) $(SRCS_TRDL) 
 # Tools
 
 CXX := g++
-CXX_LIB_INCLUDE_FLAGS := -I./lib/doctest -I./lib/etl/include
+CXX_LIB_INCLUDE_FLAGS := -I./lib/buddy_alloc -I./lib/doctest -I./lib/etl/include
 CXX_INCLUDE_FLAGS += -I./src/arduino -I./src/client -I./src/common -I./src/server -I./src/tests -I./src/trdl
 CXXFLAGS := -std=c++11 -g3 -Os -Wall -Wextra -Werror
 CXXFLAGS += -Wdouble-promotion -Wformat=2 -Wshadow -Wundef -Wunused
