@@ -1,9 +1,0 @@
-[submodule "lib/etl"]
-	path = lib/etl
-	url = https://github.com/ETLCPP/etl.git
-[submodule "lib/buddy_alloc"]
-	path = lib/buddy_alloc
-	url = https://github.com/spaskalev/buddy_alloc.git
-[submodule "lib/doctest"]
-	path = lib/doctest
-	url = https://github.com/doctest/doctest.git
