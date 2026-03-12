@@ -1,10 +1,17 @@
 import asyncio
+import threading
+import time
+
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
-# ---- simple SVG generator ----
+clients = set()
+
+# -------------------------------
+# SVG generator
+# -------------------------------
 
 
 def generate_svg(x):
@@ -16,7 +23,36 @@ def generate_svg(x):
 """
 
 
-# ---- webpage ----
+# -------------------------------
+# Shared simulation (SYNC)
+# -------------------------------
+
+
+def simulation_loop():
+
+    x = 0
+
+    while True:
+        svg = generate_svg(x)
+
+        # broadcast to clients
+        for ws in list(clients):
+            asyncio.run(ws.send_text(svg))
+
+        x += 2
+        if x > 160:
+            x = 0
+
+        time.sleep(0.1)
+
+
+# start simulation thread
+threading.Thread(target=simulation_loop, daemon=True).start()
+
+
+# -------------------------------
+# HTTP page
+# -------------------------------
 
 HTML_PAGE = """
 <!DOCTYPE html>
@@ -47,7 +83,9 @@ async def index():
     return HTMLResponse(HTML_PAGE)
 
 
-# ---- websocket ----
+# -------------------------------
+# WebSocket endpoint
+# -------------------------------
 
 
 @app.websocket("/ws")
@@ -55,15 +93,10 @@ async def websocket(ws: WebSocket):
 
     await ws.accept()
 
-    x = 0
+    clients.add(ws)
 
-    while True:
-        svg = generate_svg(x)
-
-        await ws.send_text(svg)
-
-        x += 2
-        if x > 160:
-            x = 0
-
-        await asyncio.sleep(0.1)
+    try:
+        while True:
+            await ws.receive_text()  # keep connection alive
+    except:
+        clients.remove(ws)
