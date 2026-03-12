@@ -1,5 +1,14 @@
+from queue import Queue
+import logging
+
+log = logging.getLogger(__name__)
+
+
 class Simulation:
-    def __init__(self):
+    def __init__(self, input_queue: Queue, output_queue: Queue):
+        self.input_queue = input_queue
+        self.output_queue = output_queue
+
         self.x = 0
 
     def generate_svg(self):
@@ -11,6 +20,15 @@ class Simulation:
 """
 
     def step(self):
+        # Process incoming commands
+        while not self.input_queue.empty():
+            msg = self.input_queue.get()
+            log.debug(f"Simulation received: {msg}")
+
+        # Update simulation
         self.x += 2
         if self.x > 160:
             self.x = 0
+
+        # Publish state
+        self.output_queue.put(self.generate_svg())

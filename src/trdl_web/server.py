@@ -1,40 +1,39 @@
 import asyncio
-import threading
-import time
+from queue import Empty
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .simulation import Simulation
+from .queues import sim_to_net, net_to_sim
 
-
-app = FastAPI()
-
-# static assets (js, css)
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 clients = set()
-sim = Simulation()
 
 
-def simulation_loop():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    asyncio.create_task(broadcast_loop())
+    yield  # application runs here
+    # optional shutdown cleanup
+
+
+app = FastAPI(lifespan=lifespan)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+async def broadcast_loop():
 
     while True:
-        svg = sim.generate_svg()
+        try:
+            svg = sim_to_net.get_nowait()
+        except Empty:
+            await asyncio.sleep(0.01)
+            continue
 
         for ws in list(clients):
-            try:
-                asyncio.run(ws.send_text(svg))
-            except:
-                clients.discard(ws)
-
-        sim.step()
-
-        time.sleep(0.1)
-
-
-threading.Thread(target=simulation_loop, daemon=True).start()
+            await ws.send_text(svg)
 
 
 @app.get("/")
@@ -50,6 +49,7 @@ async def websocket(ws: WebSocket):
 
     try:
         while True:
-            await ws.receive_text()
+            msg = await ws.receive_text()
+            net_to_sim.put(msg)
     except:
         clients.discard(ws)
